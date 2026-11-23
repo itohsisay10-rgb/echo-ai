@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Echo AI - مساعد الذكاء الاصطناعي</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #2a080c 0%, #0d0d10 65%, #070709 100%);
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 720px;
+      background: rgba(20, 20, 26, 0.92);
+      border: 1px solid rgba(255, 59, 79, 0.28);
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ff2e4c, #990f24);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(255, 46, 76, 0.35);
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .brand p {
+      font-size: 12px;
+      color: #b5b5c3;
+    }
+
+    .status-pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 46, 76, 0.14);
+      border: 1px solid rgba(255, 46, 76, 0.35);
+      color: #ff7b8e;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .chat-box {
+      height: 360px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(11, 11, 15, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .msg {
+      max-width: 82%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      line-height: 1.6;
+      font-size: 14px;
+      word-wrap: break-word;
+    }
+
+    .msg.bot {
+      align-self: flex-start;
+      background: #1c1c24;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #f4f4f8;
+      border-bottom-right-radius: 6px;
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #ff2e4c, #b8142c);
+      color: #ffffff;
+      border-bottom-left-radius: 6px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #14141b;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 6px 14px;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 14px;
+      padding: 8px 6px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-send {
+      background: #ff2e4c;
+      color: #ffffff;
+    }
+
+    .btn-voice {
+      background: #242430;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-voice.listening {
+      background: #ffffff;
+      color: #ff2e4c;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #9b9bae;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-badge">AI</div>
+        <div>
+          <h1>Echo AI</h1>
+          <p>مساعد ذكي تفاعلي بالصوت والكتابة</p>
+        </div>
+      </div>
+      <div class="status-pill" id="statusPill">جاهز</div>
+    </header>
+
+    <section class="chat-box" id="chatBox" aria-live="polite">
+      <div class="msg bot">
+        أهلاً بك في <strong>Echo AI</strong>! اكتب رسالتك هنا أو اضغط زر الصوت للتحدث مباشرة.
+      </div>
+    </section>
+
+    <form class="controls" id="chatForm">
+      <button type="button" class="btn btn-voice" id="voiceBtn" title="تحدث بالصوت">🎤 صوت</button>
+      <div class="input-wrap">
+        <input type="text" id="userInput" placeholder="اكتب سؤالك أو رسالتك هنا..." autocomplete="off" required />
+      </div>
+      <button type="submit" class="btn btn-send">إرسال</button>
+    </form>
+
+    <p class="hint">نسخة الويب الأولية لمشروع Echo AI — جاهزة للنشر عبر GitHub Pages</p>
+  </main>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const chatForm = document.getElementById("chatForm");
+    const userInput = document.getElementById("userInput");
+    const voiceBtn = document.getElementById("voiceBtn");
+    const statusPill = document.getElementById("statusPill");
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.className = `msg ${sender}`;
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function speakReply(text) {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "ar-SA";
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function generateReply(text) {
+      const clean = text.trim();
+      if (!clean) return "اكتب شيئاً لأتمكن من مساعدتك.";
+      if (clean.includes("مرحبا") || clean.includes("اهلا") || clean.includes("أهلا") || clean.includes("السلام")) {
+        return "يا هلا فيك! كيف أقدر أساعدك اليوم في Echo AI؟";
+      }
+      if (clean.includes("اسمك") || clean.includes("من انت") || clean.includes("من أنت"))
